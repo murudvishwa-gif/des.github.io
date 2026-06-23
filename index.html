@@ -1,0 +1,640 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Stackly Real Estate</title><link rel="stylesheet" href="style.css">
+<style>
+/* ===== Dashboard mobile hamburger + responsive fixes ===== */
+.dash-mobile-header,
+.dash-overlay{
+  display:none;
+}
+
+.dashboard{
+  min-height:100vh;
+  background:#f4f7fb;
+}
+
+.dashboard .sidebar{
+  transition:left .35s ease, transform .35s ease;
+  z-index:1002;
+}
+
+.dashboard .sidebar .dash-close{
+  display:none;
+}
+
+.dash-menu-btn{
+  border:0;
+  background:#07111f;
+  color:#fff;
+  width:44px;
+  height:44px;
+  border-radius:12px;
+  font-size:22px;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(7,17,31,.22);
+}
+
+.dash-mobile-brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:800;
+  color:#07111f;
+}
+
+.dash-mobile-brand img{
+  width:115px;
+  max-height:44px;
+  object-fit:contain;
+}
+
+.dash-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(7,17,31,.62);
+  backdrop-filter:blur(3px);
+  z-index:1001;
+}
+
+.dashboard.sidebar-open .dash-overlay{
+  display:block;
+}
+
+.card.table{
+  overflow-x:auto;
+}
+
+.card.table table{
+  width:100%;
+  min-width:560px;
+  border-collapse:collapse;
+}
+
+.card.table th,
+.card.table td{
+  padding:12px;
+  text-align:left;
+  border-bottom:1px solid rgba(0,0,0,.08);
+}
+
+@media (max-width: 992px){
+  .dashboard{
+    display:block;
+    position:relative;
+  }
+
+  .dash-mobile-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    position:sticky;
+    top:0;
+    z-index:1000;
+    background:#fff;
+    padding:14px 18px;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+  }
+
+  .dashboard .sidebar{
+    position:fixed;
+    top:0;
+    left:-290px;
+    width:280px;
+    height:100vh;
+    background:#07111f;
+    padding:22px;
+    overflow-y:auto;
+    box-shadow:20px 0 45px rgba(0,0,0,.25);
+  }
+
+  .dashboard.sidebar-open .sidebar{
+    left:0;
+  }
+
+  .dashboard .sidebar .logo{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:22px;
+  }
+
+  .dashboard .sidebar .logo img{
+    max-width:135px;
+  }
+
+  .dashboard .sidebar .dash-close{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    margin-left:auto;
+    width:38px;
+    height:38px;
+    border:0;
+    border-radius:10px;
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:25px;
+    cursor:pointer;
+  }
+
+  .dashboard .sidebar a:not(.logo){
+    display:block;
+    padding:14px 16px;
+    margin:8px 0;
+    color:#dfe8f7;
+    border-radius:12px;
+    text-decoration:none;
+  }
+
+  .dashboard .sidebar a.active,
+  .dashboard .sidebar a:not(.logo):hover{
+    background:#fff;
+    color:#07111f;
+  }
+
+  .dash-main{
+    width:100%;
+    margin-left:0!important;
+    padding:18px;
+  }
+
+  .dash-top{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:16px;
+  }
+
+  .dash-top h1{
+    font-size:clamp(1.6rem, 7vw, 2.3rem);
+    line-height:1.15;
+  }
+
+  .dash-grid,
+  .grid-3,
+  .grid-2,
+  .dash-section{
+    grid-template-columns:1fr!important;
+  }
+
+  .dash-grid{
+    gap:16px;
+  }
+
+  .card{
+    width:100%;
+  }
+
+  .logout{
+    width:100%;
+    justify-content:center;
+  }
+}
+
+@media (max-width: 560px){
+  .dash-mobile-header{
+    padding:12px 14px;
+  }
+
+  .dash-mobile-brand img{
+    width:95px;
+  }
+
+  .dash-main{
+    padding:14px;
+  }
+
+  .dashboard .sidebar{
+    width:82%;
+    max-width:310px;
+    left:-85%;
+  }
+
+  .card{
+    padding:18px!important;
+  }
+
+  .btn,
+  .logout{
+    width:100%;
+    text-align:center;
+  }
+}
+
+/* ===== Dashboard color + visibility fixes ===== */
+#dashboard{
+  display:none;
+}
+body.dashboard-mode #website{
+  display:none;
+}
+body.dashboard-mode #dashboard{
+  display:flex;
+}
+.dashboard{
+  background:
+    radial-gradient(circle at top right,rgba(200,151,58,.20),transparent 38%),
+    linear-gradient(135deg,#07111f 0%,#102039 52%,#07111f 100%) !important;
+  color:#07111f;
+}
+.dashboard .sidebar{
+  background:#07111f !important;
+  border-right:1px solid rgba(200,151,58,.24);
+}
+.dashboard .sidebar a:not(.logo){
+  color:rgba(255,255,255,.78);
+}
+.dashboard .sidebar a.active,
+.dashboard .sidebar a:not(.logo):hover{
+  background:#c8973a !important;
+  color:#07111f !important;
+}
+.dash-main{
+  background:transparent !important;
+}
+.dash-top{
+  background:rgba(255,255,255,.96);
+  border:1px solid rgba(200,151,58,.22);
+  border-radius:24px;
+  padding:24px;
+  box-shadow:0 18px 45px rgba(0,0,0,.14);
+  margin-bottom:24px;
+}
+.dashboard .card{
+  background:rgba(255,255,255,.98);
+  border:1px solid rgba(200,151,58,.18);
+  box-shadow:0 18px 45px rgba(0,0,0,.12);
+}
+.logout{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:0;
+  background:#07111f;
+  color:#fff;
+  padding:12px 22px;
+  border-radius:999px;
+  font-weight:700;
+  cursor:pointer;
+}
+.signup-nav-btn{
+  margin-left:8px;
+  background:#c8973a !important;
+  color:#07111f !important;
+}
+@media (max-width: 992px){
+  body.dashboard-mode #dashboard{
+    display:block;
+  }
+  .dash-mobile-header{
+    background:#07111f !important;
+    border-bottom:1px solid rgba(200,151,58,.25);
+  }
+  .dash-menu-btn{
+    background:#c8973a !important;
+    color:#07111f !important;
+  }
+  .dash-top{
+    padding:20px;
+  }
+}
+
+
+/* final right-side dashboard override */
+@media(max-width:992px){.dash-mobile-header{display:flex!important}.dash-mobile-header .dash-menu-btn{margin-left:auto!important;order:2!important}.dashboard .sidebar{left:auto!important;right:-310px!important}.dashboard.sidebar-open .sidebar,.dashboard .sidebar.open{right:0!important;left:auto!important}.dashboard .dash-overlay.active,.dashboard.sidebar-open .dash-overlay{display:block!important}.dash-main{margin-left:0!important;overflow-x:hidden!important}}
+.dashboard{background:radial-gradient(circle at 12% 10%,rgba(56,189,248,.28),transparent 28%),radial-gradient(circle at 86% 12%,rgba(168,85,247,.28),transparent 30%),radial-gradient(circle at 36% 92%,rgba(34,197,94,.22),transparent 30%),linear-gradient(135deg,#06121f,#172554 45%,#312e81)!important}.dashboard .card:nth-child(4n+1){background:linear-gradient(135deg,#0f766e,#172554)!important}.dashboard .card:nth-child(4n+2){background:linear-gradient(135deg,#7c3aed,#1e1b4b)!important}.dashboard .card:nth-child(4n+3){background:linear-gradient(135deg,#ea580c,#7f1d1d)!important}.dashboard .card:nth-child(4n+4){background:linear-gradient(135deg,#2563eb,#064e3b)!important}.dashboard .card,.dashboard .card p,.dashboard .muted{color:#fff!important}
+
+
+/* ===== RICH GLITCH-FREE DASHBOARD THREE-DOT MENU UPDATE ===== */
+body.dash-menu-lock{overflow:hidden !important;}
+.dashboard .dash-close{display:none !important;visibility:hidden !important;pointer-events:none !important;}
+.dashboard .dash-mobile-header{
+  display:none;
+}
+.dashboard .dash-menu-btn{
+  display:none;
+}
+@media(max-width:992px){
+  body.dashboard-mode #dashboard{display:block !important;}
+  .dashboard{
+    width:100% !important;
+    max-width:100vw !important;
+    overflow-x:hidden !important;
+  }
+  .dashboard .dash-mobile-header{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:14px !important;
+    position:sticky !important;
+    top:0 !important;
+    z-index:2800 !important;
+    min-height:68px !important;
+    padding:10px 14px !important;
+    background:linear-gradient(135deg,rgba(7,17,31,.96),rgba(30,41,59,.90),rgba(49,46,129,.88)) !important;
+    border-bottom:1px solid rgba(255,255,255,.18) !important;
+    box-shadow:0 16px 40px rgba(0,0,0,.28) !important;
+    backdrop-filter:blur(18px) !important;
+    -webkit-backdrop-filter:blur(18px) !important;
+  }
+  .dashboard .dash-mobile-brand{
+    display:flex !important;
+    align-items:center !important;
+    min-width:0 !important;
+  }
+  .dashboard .dash-mobile-brand img{
+    width:126px !important;
+    max-height:46px !important;
+    object-fit:contain !important;
+    display:block !important;
+  }
+  .dashboard .dash-menu-btn{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:4px !important;
+    flex:0 0 48px !important;
+    width:48px !important;
+    height:48px !important;
+    position:static !important;
+    margin-left:auto !important;
+    border:1px solid rgba(255,255,255,.32) !important;
+    border-radius:18px !important;
+    background:linear-gradient(135deg,#22c55e,#38bdf8,#a855f7,#f97316) !important;
+    color:#fff !important;
+    box-shadow:0 12px 30px rgba(56,189,248,.30), inset 0 1px 0 rgba(255,255,255,.35) !important;
+    cursor:pointer !important;
+    transform:none !important;
+  }
+  .dashboard .dash-menu-btn span{
+    width:6px !important;
+    height:6px !important;
+    border-radius:999px !important;
+    background:#fff !important;
+    display:block !important;
+    box-shadow:0 0 10px rgba(255,255,255,.75) !important;
+  }
+  .dashboard.sidebar-open .dash-menu-btn{
+    box-shadow:0 0 0 4px rgba(56,189,248,.16),0 16px 34px rgba(168,85,247,.35) !important;
+  }
+  .dashboard .dash-overlay{
+    display:block !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+    position:fixed !important;
+    inset:0 !important;
+    z-index:2450 !important;
+    background:rgba(2,6,23,.62) !important;
+    backdrop-filter:blur(7px) !important;
+    -webkit-backdrop-filter:blur(7px) !important;
+    transition:opacity .25s ease !important;
+  }
+  .dashboard.sidebar-open .dash-overlay{
+    opacity:1 !important;
+    pointer-events:auto !important;
+  }
+  .dashboard .sidebar{
+    display:block !important;
+    position:fixed !important;
+    top:0 !important;
+    left:auto !important;
+    right:0 !important;
+    width:min(84vw,310px) !important;
+    height:100dvh !important;
+    z-index:2500 !important;
+    padding:86px 18px 24px !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    transform:translateX(112%) !important;
+    transition:transform .34s cubic-bezier(.22,.9,.22,1) !important;
+    background:
+      radial-gradient(circle at 25% 6%,rgba(56,189,248,.24),transparent 30%),
+      radial-gradient(circle at 90% 20%,rgba(249,115,22,.22),transparent 26%),
+      linear-gradient(180deg,#07111f,#172554 52%,#312e81) !important;
+    border-left:1px solid rgba(255,255,255,.20) !important;
+    box-shadow:-28px 0 70px rgba(0,0,0,.46) !important;
+  }
+  .dashboard.sidebar-open .sidebar{
+    transform:translateX(0) !important;
+  }
+  .dashboard .sidebar .logo{
+    position:absolute !important;
+    top:18px !important;
+    left:18px !important;
+    margin:0 !important;
+    display:flex !important;
+    pointer-events:auto !important;
+  }
+  .dashboard .sidebar .logo img{
+    width:140px !important;
+    max-height:46px !important;
+    object-fit:contain !important;
+  }
+  .dashboard .sidebar a:not(.logo){
+    margin:9px 0 !important;
+    padding:15px 16px !important;
+    border-radius:18px !important;
+    background:rgba(255,255,255,.08) !important;
+    border:1px solid rgba(255,255,255,.12) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10) !important;
+  }
+  .dashboard .sidebar a.active,
+  .dashboard .sidebar a:not(.logo):hover{
+    background:linear-gradient(135deg,#22c55e,#38bdf8,#a855f7) !important;
+    color:#06121f !important;
+  }
+  .dash-main{
+    margin-left:0 !important;
+    width:100% !important;
+    padding:18px 14px 28px !important;
+    overflow-x:hidden !important;
+  }
+}
+@media(max-width:560px){
+  .dashboard .dash-mobile-header{min-height:64px !important;padding:9px 12px !important;}
+  .dashboard .dash-mobile-brand img{width:112px !important;}
+  .dashboard .dash-menu-btn{width:46px !important;height:46px !important;flex-basis:46px !important;border-radius:16px !important;}
+  .dashboard .sidebar{width:min(88vw,300px) !important;padding-top:82px !important;}
+}
+</style>
+</head><body><div id="website"><header><nav class="nav"><a class="logo" href="index.html"><img src="assets/logo-dark.webp" alt="Stackly Logo"></a><div class="nav-links" id="navLinks"><a href="index.html">Home</a><a href="about.html">About</a><a href="properties.html">Properties</a><a href="services.html">Services</a><a href="agents.html">Agents</a><a href="blog.html">Blog</a><a href="contact.html">Contact</a><div class="nav-auth-mobile"><button class="nav-btn login-nav-btn" onclick="openAuth('login')">Login</button><button class="nav-btn signup-nav-btn" onclick="openAuth('signup')">Signup</button></div></div><div class="nav-auth"><button class="nav-btn login-nav-btn" onclick="openAuth('login')">Login</button><button class="nav-btn signup-nav-btn" onclick="openAuth('signup')">Signup</button></div><div class="hamburger" onclick="toggleMenu()">☰</div></nav></header><section class="hero" id="home"><div class="container hero-grid"><div class="reveal"><p class="eyebrow">Modern Real Estate Platform</p><h1>Find Your Dream <span>Luxury Home</span> With Stackly</h1><p>Discover verified apartments, villas, commercial spaces, and smart homes with expert support, transparent pricing, visit booking, investment insights, and dashboard tracking.</p><div class="hero-actions"><a href="properties.html" class="btn btn-primary">Explore Properties</a><button class="btn btn-outline" onclick="openAuth('signup')">Create Account</button><button class="btn btn-outline" onclick="scrollToSection('home-search')">Search Now</button></div></div><div class="hero-card reveal"><img src="assets/hero-villa.webp"></div></div></section><section id="home-search"><div class="container"><div class="section-title reveal"><span>Smart Search</span><h2>Search Your Perfect Property</h2><p class="muted">Filter by city, property type, budget, and lifestyle needs.</p></div><div class="search-box reveal"><input id="searchLocation" placeholder="Location"><select id="searchType"><option>Property Type</option><option>Villa</option><option>Apartment</option><option>Commercial</option></select><select id="searchBudget"><option>Budget</option><option>₹50L - ₹1Cr</option><option>₹1Cr - ₹3Cr</option><option>₹3Cr+</option></select><button class="btn btn-primary" onclick="searchProperties()">Search</button></div></div></section><section><div class="container"><div class="section-title reveal"><span>Featured</span><h2>Premium Properties</h2><p class="muted">Handpicked homes with verified details, clear pricing, and visit-ready availability.</p></div><div class="grid-3"><div class="card property reveal"><img src="assets/modern-house.webp"><p class="price">₹1.25 Cr</p><h3>Modern Family Villa</h3><p>Bangalore • 4 Beds • 3 Baths • 3200 sqft</p><div class="tag-row"><span>Family Villa</span><span>Verified</span></div><button class="btn btn-outline" onclick="viewProperty('Modern Family Villa')">View Details</button><button class="btn btn-primary" onclick="bookVisit('Modern Family Villa')">Book Visit</button></div><div class="card property reveal"><img src="assets/luxury-interior.webp"><p class="price">₹86 Lakhs</p><h3>Luxury City Apartment</h3><p>Mumbai • 3 Beds • 2 Baths • 1800 sqft</p><div class="tag-row"><span>City Living</span><span>Verified</span></div><button class="btn btn-outline" onclick="viewProperty('Luxury City Apartment')">View Details</button><button class="btn btn-primary" onclick="bookVisit('Luxury City Apartment')">Book Visit</button></div><div class="card property reveal"><img src="assets/premium-villa.webp"><p class="price">₹2.8 Cr</p><h3>Premium Smart Home</h3><p>Hyderabad • 5 Beds • 4 Baths • 4200 sqft</p><div class="tag-row"><span>Smart Home</span><span>Verified</span></div><button class="btn btn-outline" onclick="viewProperty('Premium Smart Home')">View Details</button><button class="btn btn-primary" onclick="bookVisit('Premium Smart Home')">Book Visit</button></div><div class="card property reveal"><img src="assets/home-exterior.webp"><p class="price">₹1.65 Cr</p><h3>Lake View Residence</h3><p>Pune • 4 Beds • 4 Baths • 3500 sqft</p><div class="tag-row"><span>Lake View</span><span>Verified</span></div><button class="btn btn-outline" onclick="viewProperty('Lake View Residence')">View Details</button><button class="btn btn-primary" onclick="bookVisit('Lake View Residence')">Book Visit</button></div><div class="card property reveal"><img src="assets/living-room.webp"><p class="price">₹72 Lakhs</p><h3>Urban Apartment</h3><p>Chennai • 2 Beds • 2 Baths • 1450 sqft</p><div class="tag-row"><span>Budget Pick</span><span>Verified</span></div><button class="btn btn-outline" onclick="viewProperty('Urban Apartment')">View Details</button><button class="btn btn-primary" onclick="bookVisit('Urban Apartment')">Book Visit</button></div><div class="card property reveal"><img src="assets/apartment-view.webp"><p class="price">₹3.4 Cr</p><h3>Royal Garden Villa</h3><p>Delhi NCR • 5 Beds • 5 Baths • 5100 sqft</p><div class="tag-row"><span>Luxury</span><span>Verified</span></div><button class="btn btn-outline" onclick="viewProperty('Royal Garden Villa')">View Details</button><button class="btn btn-primary" onclick="bookVisit('Royal Garden Villa')">Book Visit</button></div></div></div></section><section class="stats"><div class="container grid-4"><div class="stat reveal"><h3>1200+</h3><p>Verified Properties</p></div><div class="stat reveal"><h3>850+</h3><p>Happy Clients</p></div><div class="stat reveal"><h3>45+</h3><p>Cities Covered</p></div><div class="stat reveal"><h3>12+</h3><p>Years Experience</p></div></div></section><section><div class="container"><div class="section-title reveal"><span>Benefits</span><h2>Why Choose Stackly?</h2></div><div class="grid-3"><div class="card reveal"><div class="icon">✅</div><h3>Verified Listings</h3><p>Every property is reviewed for photos, ownership details, amenities, location accuracy, and pricing quality before publishing.</p></div><div class="card reveal"><div class="icon">🤝</div><h3>Expert Agents</h3><p>Professional agents guide visits, negotiations, documentation, loan coordination, and closing support.</p></div><div class="card reveal"><div class="icon">📊</div><h3>Smart Dashboard</h3><p>Track saved homes, visits, messages, documents, property progress, and buyer preferences in one clean dashboard.</p></div></div></div></section><section><div class="container"><div class="section-title"><span>Investment Insights</span><h2>Make Better Property Decisions</h2></div><div class="grid-3"><div class="card"><h3>Price Trends</h3><p class="muted">Compare local price movement, rental demand, upcoming infrastructure, and resale potential.</p></div><div class="card"><h3>Area Guide</h3><p class="muted">Explore schools, hospitals, offices, public transport, lifestyle zones, and safety factors.</p></div><div class="card"><h3>Loan Support</h3><p class="muted">Get guidance on eligibility, EMI planning, documents, and home loan partner coordination.</p></div></div></div></section><section class="cta"><div class="container reveal"><h2>Ready To Find Your New Home?</h2><p>Create an account and access saved homes, visit booking, expert messages, document tracking, and profile preferences.</p><button class="btn" style="background:#07111f;color:white" onclick="openAuth('signup')">Get Started</button></div></section><footer><div class="footer-grid rich-footer"><div><a class="logo" href="index.html"><img src="assets/logo-dark.webp" alt="Stackly Logo"></a><p>Stackly Estate is a premium property platform built for buyers, sellers, renters, and investors who want verified listings, expert guidance, and a smoother property journey.</p><div class="footer-social"><a href="404page.html" aria-label="Instagram">Instagram</a><a href="404page.html" aria-label="LinkedIn">LinkedIn</a><a href="404page.html" aria-label="YouTube">YouTube</a></div></div><div><h3>Company</h3><a href="about.html">About Stackly</a><a href="services.html">Services</a><a href="agents.html">Expert Agents</a><a href="contact.html">Contact Team</a></div><div><h3>Property Types</h3><a href="properties.html">Luxury Villas</a><a href="properties.html">City Apartments</a><a href="properties.html">Commercial Spaces</a><a href="properties.html">Investment Homes</a></div><div><h3>Contact</h3><p>support@stacklyestate.com<br>+91 98765 43210<br>Bangalore • Mumbai • Hyderabad • Delhi</p><button class="footer-btn" onclick="openAuth('signup')">Create Free Account</button></div></div><div class="footer-bottom"><span>© 2026 Stackly Estate. All rights reserved.</span><span>Verified listings • Smart dashboard • Trusted agents</span></div></footer></div><div class="auth-modal" id="authModal"><div class="auth-box"><span class="close" onclick="closeAuth()">×</span><h2 id="authTitle">Login</h2><input type="text" id="nameField" placeholder="Full Name" style="display:none"><input type="email" id="email" placeholder="Email Address"><input type="password" id="password" placeholder="Password"><div id="loginError" class="login-error" aria-live="polite"></div><button class="btn btn-primary" onclick="authSubmit()">Continue</button><a class="forgot-link" onclick="forgotPassword()">Forgot Password?</a><p class="auth-switch"><span id="switchText" onclick="switchAuth()">Create account</span></p></div></div><div class="dashboard" id="dashboard"><div class="dash-mobile-header"><a class="dash-mobile-brand" href="index.html"><img src="assets/logo-dark.webp" alt="Stackly Logo"></a><button class="dash-menu-btn" type="button" onclick="toggleDashMenu()"><span></span><span></span><span></span></button></div><div class="dash-overlay" onclick="closeDashMenu()"></div><aside class="sidebar"><a class="logo" href="index.html"><img src="assets/logo-dark.webp" alt="Stackly Logo"></a><a class="active" onclick="showDashTab('overview',this)">Dashboard</a><a onclick="showDashTab('properties',this)">My Properties</a><a onclick="showDashTab('saved',this)">Saved Homes</a><a onclick="showDashTab('messages',this)">Messages</a><a onclick="showDashTab('profile',this)">Profile</a></aside><main class="dash-main"><div class="dash-top"><div><h1>Welcome, <span id="userName">User</span></h1><p class="muted">Manage saved homes, visits, agent messages, property deals, and profile information in one place.</p></div><button class="logout" onclick="logout()">Logout</button></div><div id="dash-overview" class="dash-tab active"><div class="dash-grid"><div class="card"><h3>Saved Homes</h3><p class="price">12</p><p class="muted">3 new matches added this week.</p></div><div class="card"><h3>Visits Booked</h3><p class="price">5</p><p class="muted">Next visit: Saturday 11:00 AM.</p></div><div class="card"><h3>Messages</h3><p class="price">8</p><p class="muted">2 unread agent updates.</p></div><div class="card"><h3>Active Deals</h3><p class="price">2</p><p class="muted">Negotiation and document review active.</p></div></div><div class="dash-section"><div class="card table"><h3>Recent Properties</h3><table><tr><th>Property</th><th>Location</th><th>Price</th><th>Status</th></tr><tr><td>Luxury Villa</td><td>Bangalore</td><td>₹1.25 Cr</td><td class="status">Available</td></tr><tr><td>City Apartment</td><td>Mumbai</td><td>₹86 L</td><td class="status">Booked Visit</td></tr><tr><td>Smart Home</td><td>Hyderabad</td><td>₹2.8 Cr</td><td class="status">Shortlisted</td></tr></table></div><div class="card"><h3>Today’s Checklist</h3><p class="muted">✓ Review shortlisted homes<br>✓ Confirm visit timing<br>✓ Upload ID proof<br>✓ Compare loan estimate</p><button class="btn btn-outline" onclick="showToast('Checklist updated')">Update Checklist</button></div></div></div><div id="dash-properties" class="dash-tab"><div class="grid-3"><div class="card"><h3>Listed for Sale</h3><p class="muted">Upload photos, pricing, documents, and amenities for your property listing.</p><button class="btn btn-primary" onclick="showToast('Property listing form opened')">Add Property</button></div><div class="card"><h3>Site Visits</h3><p class="muted">Track upcoming customer visits and agent appointments.</p><button class="btn btn-outline" onclick="showToast('Visit calendar opened')">View Visits</button></div><div class="card"><h3>Documents</h3><p class="muted">Sale deed, tax records, approvals, and ownership papers.</p><button class="btn btn-outline" onclick="showToast('Document center opened')">Open Documents</button></div></div></div><div id="dash-saved" class="dash-tab"><div class="grid-3"><div class="card"><h3>Lake View Residence</h3><p class="price">₹1.65 Cr</p><p class="muted">Whitefield • 4 Beds • High appreciation zone.</p><button class="btn btn-outline" onclick="bookVisit('Lake View Residence')">Book Visit</button></div><div class="card"><h3>Urban Apartment</h3><p class="price">₹72 Lakhs</p><p class="muted">Pune • 2 Beds • Metro connected location.</p><button class="btn btn-outline" onclick="bookVisit('Urban Apartment')">Book Visit</button></div><div class="card"><h3>Royal Garden Villa</h3><p class="price">₹3.4 Cr</p><p class="muted">Bangalore • 5 Beds • Premium gated community.</p><button class="btn btn-outline" onclick="bookVisit('Royal Garden Villa')">Book Visit</button></div></div></div><div id="dash-messages" class="dash-tab"><div class="grid-2"><div class="card"><h3>Agent Update</h3><p class="muted">Rahul Sharma: Your villa visit is confirmed. Please carry ID proof for society entry.</p><button class="btn btn-primary" onclick="showToast('Reply box opened')">Reply</button></div><div class="card"><h3>Loan Advisor</h3><p class="muted">Your estimated eligibility report is ready for review.</p><button class="btn btn-outline" onclick="showToast('Loan report opened')">View Report</button></div></div></div><div id="dash-profile" class="dash-tab"><div class="dash-section"><div class="card"><h3>Profile Details</h3><p><b>Name:</b> <span id="profileName">User</span></p><p><b>Email:</b> <span id="profileEmail">user@email.com</span></p><p><b>Plan:</b> Premium Buyer</p><p><b>Preferred City:</b> Bangalore</p><p><b>Budget Range:</b> ₹75L - ₹2Cr</p><button class="btn btn-primary" onclick="showToast('Profile saved successfully')">Save Profile</button></div><div class="card"><h3>Preferences</h3><p class="muted">Property type: Villa / Apartment<br>Bedrooms: 3+<br>Locality: Near schools, tech parks, and metro<br>Alerts: Enabled</p></div></div></div></main></div><div id="toast"></div>
+<script>
+/* ===== Dashboard hamburger controls ===== */
+function toggleDashMenu(){
+  const dashboard = document.getElementById('dashboard');
+  const sidebar = document.querySelector('.dashboard .sidebar');
+  const overlay = document.querySelector('.dashboard .dash-overlay');
+  if(dashboard){
+    dashboard.classList.toggle('sidebar-open');
+    sidebar?.classList.toggle('open');
+    overlay?.classList.toggle('active');
+    document.body.style.overflow = dashboard.classList.contains('sidebar-open') ? 'hidden' : '';
+  }
+}
+
+function closeDashMenu(){
+  const dashboard = document.getElementById('dashboard');
+  if(dashboard){
+    dashboard.classList.remove('sidebar-open');
+    document.querySelector('.dashboard .sidebar')?.classList.remove('open');
+    document.querySelector('.dashboard .dash-overlay')?.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+/* Close dashboard menu after clicking any dashboard tab on mobile */
+document.addEventListener('click', function(e){
+  const dashLink = e.target.closest('.dashboard .sidebar a:not(.logo)');
+  if(dashLink && window.innerWidth <= 992){
+    closeDashMenu();
+  }
+});
+
+window.addEventListener('resize', function(){
+  if(window.innerWidth > 992){
+    closeDashMenu();
+  }
+});
+
+/* Safe tab function if your external script does not already include it */
+if(typeof showDashTab !== 'function'){
+  function showDashTab(tab, el){
+    document.querySelectorAll('.dash-tab').forEach(item => item.classList.remove('active'));
+    const activeTab = document.getElementById('dash-' + tab);
+    if(activeTab) activeTab.classList.add('active');
+
+    document.querySelectorAll('.dashboard .sidebar a').forEach(link => link.classList.remove('active'));
+    if(el) el.classList.add('active');
+  }
+}
+</script>
+<div id="authLoader" class="auth-loader"><div class="auth-spinner"></div><p>Loading secure page...</p></div><script src="script.js"></script>
+<script>
+/* ===== Login / Signup / Dashboard fixed flow ===== */
+let authMode = 'login';
+
+function openAuth(mode){startAuthLoad(mode || 'login');}
+
+function closeAuth(){
+  const modal = document.getElementById('authModal');
+  if(modal) modal.classList.remove('active');
+}
+
+function switchAuth(){
+  openAuth(authMode === 'signup' ? 'login' : 'signup');
+}
+
+function authSubmit(){
+  const name = document.getElementById('nameField')?.value.trim();
+  const email = document.getElementById('email')?.value.trim();
+  const password = document.getElementById('password')?.value.trim();
+  if(authMode === 'signup' && !name){
+    showToast('Please enter your full name');
+    return;
+  }
+  if(!email || !password){
+    showToast('Please fill email and password');
+    return;
+  }
+  document.getElementById('userName').textContent = name || email.split('@')[0] || 'User';
+  document.getElementById('profileName').textContent = name || email.split('@')[0] || 'User';
+  document.getElementById('profileEmail').textContent = email;
+  closeAuth();
+  document.body.classList.add('dashboard-mode');
+  closeDashMenu();
+  showToast(authMode === 'signup' ? 'Signup successful' : 'Login successful');
+}
+
+function logout(){
+  document.body.classList.remove('dashboard-mode');
+  closeDashMenu();
+  showToast('Logged out successfully');
+}
+</script>
+
+<script>
+/* ===== Requested functionality fixes ===== */
+(function(){
+  const propertyData={
+    'modern-family-villa':{title:'Modern Family Villa',price:'₹1.25 Cr',hero:'Premium Modern Family Villa',desc:'Spacious Bangalore family villa with premium interiors, private garden, verified documents, and visit-ready availability.',meta:'4 Beds • 3 Baths • 3200 sqft • Bangalore • Family Villa • Verified Listing',imgs:['assets/modern-house.webp','assets/office-interior.webp','assets/city-home.webp']},
+    'luxury-city-apartment':{title:'Luxury City Apartment',price:'₹86 Lakhs',hero:'Luxury City Apartment',desc:'Mumbai apartment with modern amenities, excellent connectivity, and comfortable city living.',meta:'3 Beds • 2 Baths • 1800 sqft • Mumbai • City Living • Verified Listing',imgs:['assets/luxury-interior.webp','assets/living-room.webp','assets/home-exterior.webp']},
+    'premium-smart-home':{title:'Premium Smart Home',price:'₹2.8 Cr',hero:'Premium Smart Home',desc:'Luxury gated community home with smart automation, premium interiors, landscaped garden, security, and excellent connectivity.',meta:'5 Beds • 4 Baths • 4200 sqft • Hyderabad • Gated community • Smart security • Clubhouse • Garden view',imgs:['assets/premium-villa.webp','assets/office-interior.webp','assets/city-home.webp']}
+  };
+  function slugify(v){return String(v||'').toLowerCase().replace(/₹/g,'').replace(/cr/g,'').replace(/lakhs/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+  window.viewProperty=function(name){
+    const key=slugify(name);
+    const fixed=key.includes('modern-family-villa')?'modern-family-villa':key.includes('luxury-city-apartment')?'luxury-city-apartment':key.includes('premium-smart-home')?'premium-smart-home':key;
+    if(window.showToast) showToast('Opening details for '+name);
+    setTimeout(()=>{location.href='property-details.html?property='+fixed;},250);
+  };
+  window.goDashboardHome=function(){
+    const dash=document.getElementById('dashboard');
+    const first=document.querySelector('.dashboard .sidebar a:not(.logo)');
+    if(typeof window.showDashTab==='function') showDashTab('overview',first);
+    if(dash) dash.scrollIntoView({behavior:'smooth',block:'start'});
+    if(window.closeDashMenu) closeDashMenu();
+    if(window.showToast) showToast('Dashboard home opened');
+    return false;
+  };
+  window.listProperty=function(){showToast('Property listing started. Create/login to continue.');setTimeout(()=>openAuth('signup'),500);};
+  window.loanAdvisor=function(){showToast('Loan advisor request started. Login/signup to track your report.');setTimeout(()=>openAuth('signup'),500);};
+  window.checkDocuments=function(){showToast('Document checklist opened. Login/signup to upload documents.');setTimeout(()=>openAuth('signup'),500);};
+  window.getLoanHelp=function(){showToast('Loan help request started. Our advisor will guide EMI and documents.');setTimeout(()=>openAuth('signup'),500);};
+  window.forgotPassword=function(){
+    const email=(document.getElementById('email')?.value||'').trim();
+    if(!email){ if(window.setLoginError) setLoginError('email','Please enter your email to reset password'); else alert('Please enter your email to reset password'); return; }
+    if(window.showToast) showToast('Password reset link sent to '+email); else alert('Password reset link sent to '+email);
+  };
+  const articles={
+    'How To Choose The Right Locality':'Compare schools, workplaces, transport, safety, hospitals, future road/metro plans, water supply, and resale demand before choosing a locality.',
+    'Home Loan Checklist':'Keep income proof, bank statements, PAN/Aadhaar, property papers, credit score report, down payment plan, and EMI budget ready before applying.',
+    'Villa vs Apartment':'Villas offer privacy and land value, while apartments offer shared amenities, security, and lower maintenance responsibility. Choose based on budget and lifestyle.'
+  };
+  window.readArticle=function(title){
+    let panel=document.getElementById('articlePanel');
+    if(!panel){
+      const container=document.querySelector('.section-title')?.parentElement || document.querySelector('.container') || document.body;
+      panel=document.createElement('div'); panel.id='articlePanel'; container.appendChild(panel);
+    }
+    panel.innerHTML='<div class="card"><h2>'+title+'</h2><p class="muted">'+(articles[title]||'Full article content is opening here with property guidance and practical next steps.')+'</p><button class="btn btn-primary" onclick="document.getElementById(\'articlePanel\').innerHTML=\'\'">Close Article</button></div>';
+    panel.scrollIntoView({behavior:'smooth',block:'start'});
+    if(window.showToast) showToast('Article opened');
+  };
+  function markActiveModule(){
+    const page=(location.pathname.split('/').pop()||'index.html');
+    document.querySelectorAll('.nav-links a').forEach(a=>{
+      const href=a.getAttribute('href')||'';
+      if((page==='index.html'&&href==='index.html') || href===page) a.classList.add('active-module');
+    });
+    const heroTitle=document.querySelector('.page-hero h1,.hero h1');
+  }
+  function fixDashboardLogo(){
+    document.querySelectorAll('.dashboard .sidebar .logo,.dashboard .dash-mobile-brand').forEach(a=>{
+      a.setAttribute('href','#');
+      a.onclick=goDashboardHome;
+    });
+  }
+  function applyPropertyDetails(){
+    if(!location.pathname.endsWith('property-details.html')) return;
+    const key=new URLSearchParams(location.search).get('property')||'premium-smart-home';
+    const data=propertyData[key]||propertyData['premium-smart-home'];
+    const heroH1=document.querySelector('.page-hero h1');
+    const heroP=document.querySelector('.page-hero p');
+    if(heroH1) heroH1.textContent=data.hero;
+    if(heroP) heroP.textContent=data.desc;
+    const price=document.querySelector('.grid-2 .card .price');
+    const title=document.querySelector('.grid-2 .card h2');
+    const meta=document.querySelector('.grid-2 .card .muted');
+    if(price) price.textContent=data.price;
+    if(title) title.textContent=data.title;
+    if(meta) meta.textContent=data.meta;
+    document.querySelectorAll('.gallery img').forEach((img,i)=>{if(data.imgs[i]) img.src=data.imgs[i];});
+    document.querySelectorAll('button').forEach(btn=>{
+      if(btn.textContent.trim().toLowerCase().includes('book')) btn.setAttribute('onclick',`bookVisit('${data.title}')`);
+      if(btn.textContent.trim().toLowerCase().includes('contact')) btn.setAttribute('onclick',`contactAgent('${data.title} Agent')`);
+    });
+  }
+  document.addEventListener('DOMContentLoaded',()=>{markActiveModule();fixDashboardLogo();applyPropertyDetails();});
+  window.addEventListener('load',()=>{fixDashboardLogo();});
+})();
+</script>
+</body></html>
