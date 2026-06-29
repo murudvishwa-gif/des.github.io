@@ -11,7 +11,7 @@ function startAuthLoad(mode){
   loader.classList.add('show');
   document.body.classList.remove('dash-menu-lock');
   document.getElementById('navLinks')?.classList.remove('active');
-  setTimeout(()=>{ window.location.href=page; },5000);
+  window.location.href=page;
 }
 let authMode = "login";
 function qs(id){return document.getElementById(id)}
@@ -59,10 +59,10 @@ function authSubmit(){
 function logout(){qs("dashboard").style.display="none";qs("website").style.display="block";['email','password','nameField'].forEach(id=>{if(qs(id))qs(id).value=''});showToast('Logged out successfully');window.scrollTo(0,0)}
 function showToast(msg){let t=qs('toast'); if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t)} t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400)}
 function scrollToSection(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth'})}
-function searchProperties(){const loc=qs('searchLocation')?.value || 'your selected location'; const type=qs('searchType')?.value || 'property'; const budget=qs('searchBudget')?.value || 'budget'; showToast(`Searching ${type} in ${loc} within ${budget}`); setTimeout(()=>{ if(!location.pathname.endsWith('properties.html')) location.href='properties.html'; },700)}
-function bookVisit(name){showToast(`Visit request sent for ${name}. Please login/signup to track it.`); setTimeout(()=>openAuth('signup'),900)}
-function viewProperty(name){showToast(`Opening details for ${name}`); setTimeout(()=>location.href='property-details.html',500)}
-function contactAgent(name){showToast(`${name} will contact you shortly`); setTimeout(()=>openAuth('signup'),800)}
+function searchProperties(){const loc=qs('searchLocation')?.value || 'your selected location'; const type=qs('searchType')?.value || 'property'; const budget=qs('searchBudget')?.value || 'budget'; showToast(`Searching ${type} in ${loc} within ${budget}`); if(!location.pathname.endsWith('properties.html')) location.href='properties.html'}
+function bookVisit(name){showToast(`Visit request sent for ${name}. Please login/signup to track it.`); openAuth('signup')}
+function viewProperty(name){const key=getPropertyKey(name);showToast(`Opening details for ${name}`);location.href='property-details.html?property='+key}
+function contactAgent(name){showToast(`${name} will contact you shortly`); openAuth('signup')}
 function readArticle(title){showToast(`Opening article: ${title}`)}
 function clearContactError(id){
   const field=qs(id);
@@ -163,9 +163,56 @@ window.addEventListener('load',setupDashboardMenu);
 
 /* Requested functionality fixes shared external */
 function forgotPassword(){const email=(document.getElementById('email')?.value||'').trim();if(!email){if(typeof setLoginError==='function')setLoginError('email','Please enter your email to reset password');else alert('Please enter your email to reset password');return;}showToast('Password reset link sent to '+email);}
-function listProperty(){showToast('Property listing started. Create/login to continue.');setTimeout(()=>openAuth('signup'),500)}
-function loanAdvisor(){showToast('Loan advisor request started. Login/signup to track your report.');setTimeout(()=>openAuth('signup'),500)}
-function checkDocuments(){showToast('Document checklist opened. Login/signup to upload documents.');setTimeout(()=>openAuth('signup'),500)}
-function getLoanHelp(){showToast('Loan help request started. Our advisor will guide EMI and documents.');setTimeout(()=>openAuth('signup'),500)}
+function listProperty(){showToast('Property listing started. Create/login to continue.');openAuth('signup')}
+function loanAdvisor(){showToast('Loan advisor request started. Login/signup to track your report.');openAuth('signup')}
+function checkDocuments(){showToast('Document checklist opened. Login/signup to upload documents.');openAuth('signup')}
+function getLoanHelp(){showToast('Loan help request started. Our advisor will guide EMI and documents.');openAuth('signup')}
 function goDashboardHome(){const first=document.querySelector('.dashboard .sidebar a:not(.logo)');if(typeof showDashTab==='function')showDashTab('overview',first);document.getElementById('dashboard')?.scrollIntoView({behavior:'smooth',block:'start'});if(typeof closeDashMenu==='function')closeDashMenu();showToast('Dashboard home opened');return false}
-(function(){const oldView=window.viewProperty;window.viewProperty=function(name){const key=String(name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');const fixed=key.includes('modern-family-villa')?'modern-family-villa':key.includes('luxury-city-apartment')?'luxury-city-apartment':key.includes('premium-smart-home')?'premium-smart-home':key;showToast('Opening details for '+name);setTimeout(()=>location.href='property-details.html?property='+fixed,250)};window.addEventListener('load',()=>{document.querySelectorAll('.dashboard .sidebar .logo,.dashboard .dash-mobile-brand').forEach(a=>{a.href='#';a.onclick=goDashboardHome});const page=(location.pathname.split('/').pop()||'index.html');document.querySelectorAll('.nav-links a').forEach(a=>{if(a.getAttribute('href')===page || (page==='index.html'&&a.getAttribute('href')==='index.html'))a.classList.add('active-module')});});})();
+
+const propertyData={
+  'modern-family-villa':{title:'Modern Family Villa',price:'₹1.25 Cr',hero:'Premium Modern Family Villa',desc:'Spacious Bangalore family villa with premium interiors, private garden, verified documents, and visit-ready availability.',meta:'4 Beds • 3 Baths • 3200 sqft • Bangalore • Family Villa • Verified Listing',imgs:['assets/modern-house.webp','assets/office-interior.webp','assets/city-home.webp']},
+  'luxury-city-apartment':{title:'Luxury City Apartment',price:'₹86 Lakhs',hero:'Luxury City Apartment',desc:'Mumbai apartment with modern amenities, excellent connectivity, and comfortable city living.',meta:'3 Beds • 2 Baths • 1800 sqft • Mumbai • City Living • Verified Listing',imgs:['assets/luxury-interior.webp','assets/living-room.webp','assets/home-exterior.webp']},
+  'premium-smart-home':{title:'Premium Smart Home',price:'₹2.8 Cr',hero:'Premium Smart Home',desc:'Luxury gated community home with smart automation, premium interiors, landscaped garden, security, and excellent connectivity.',meta:'5 Beds • 4 Baths • 4200 sqft • Hyderabad • Gated community • Smart security • Clubhouse • Garden view',imgs:['assets/premium-villa.webp','assets/office-interior.webp','assets/city-home.webp']},
+  'lake-view-residence':{title:'Lake View Residence',price:'₹1.65 Cr',hero:'Lake View Residence',desc:'Premium Pune residence with spacious rooms, lake-facing surroundings, verified papers, and visit-ready availability.',meta:'4 Beds • 4 Baths • 3500 sqft • Pune • Lake View • Verified Listing',imgs:['assets/home-exterior.webp','assets/living-room.webp','assets/modern-house.webp']},
+  'urban-apartment':{title:'Urban Apartment',price:'₹72 Lakhs',hero:'Urban Apartment',desc:'Efficient Chennai apartment with smart planning, city connectivity, practical amenities, and a budget-friendly price.',meta:'2 Beds • 2 Baths • 1450 sqft • Chennai • Budget Pick • Verified Listing',imgs:['assets/living-room.webp','assets/luxury-interior.webp','assets/city-home.webp']},
+  'royal-garden-villa':{title:'Royal Garden Villa',price:'₹3.4 Cr',hero:'Royal Garden Villa',desc:'Large Delhi NCR villa with garden-facing spaces, luxury finishes, premium privacy, and full family comfort.',meta:'5 Beds • 5 Baths • 5100 sqft • Delhi NCR • Luxury Villa • Verified Listing',imgs:['assets/apartment-view.webp','assets/premium-villa.webp','assets/home-exterior.webp']}
+};
+function getPropertyKey(name){
+  const key=String(name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  return propertyData[key]?key:'premium-smart-home';
+}
+function applyPropertyDetails(){
+  if(!location.pathname.endsWith('property-details.html')) return;
+  const key=new URLSearchParams(location.search).get('property')||'premium-smart-home';
+  const data=propertyData[key]||propertyData['premium-smart-home'];
+  const heroH1=document.querySelector('.page-hero h1');
+  const heroP=document.querySelector('.page-hero p');
+  if(heroH1) heroH1.textContent=data.hero;
+  if(heroP) heroP.textContent=data.desc;
+  const price=document.querySelector('.grid-2 .card .price');
+  const title=document.querySelector('.grid-2 .card h2');
+  const meta=document.querySelector('.grid-2 .card .muted');
+  if(price) price.textContent=data.price;
+  if(title) title.textContent=data.title;
+  if(meta) meta.textContent=data.meta;
+  document.querySelectorAll('.gallery img').forEach((img,i)=>{if(data.imgs[i]) img.src=data.imgs[i]});
+  document.querySelectorAll('button').forEach(btn=>{
+    const text=btn.textContent.trim().toLowerCase();
+    if(text.includes('book')) btn.setAttribute('onclick',`bookVisit('${data.title}')`);
+    if(text.includes('contact')) btn.setAttribute('onclick',`contactAgent('${data.title} Agent')`);
+  });
+}
+function openDashboardFromUrl(){
+  const params=new URLSearchParams(location.search);
+  if(params.get('dashboard')!=='1') return;
+  const name=params.get('name')||'User';
+  const email=params.get('email')||'user@email.com';
+  if(qs('website')) qs('website').style.display='none';
+  if(qs('dashboard')) qs('dashboard').style.display='block';
+  if(qs('userName')) qs('userName').innerText=name;
+  if(qs('profileName')) qs('profileName').innerText=name;
+  if(qs('profileEmail')) qs('profileEmail').innerText=email;
+  setupDashboardMenu();
+  history.replaceState(null,'','index.html');
+}
+(function(){window.addEventListener('load',()=>{document.querySelectorAll('.dashboard .sidebar .logo,.dashboard .dash-mobile-brand').forEach(a=>{a.href='#';a.onclick=goDashboardHome});const page=(location.pathname.split('/').pop()||'index.html');document.querySelectorAll('.nav-links a').forEach(a=>{if(a.getAttribute('href')===page || (page==='index.html'&&a.getAttribute('href')==='index.html'))a.classList.add('active-module')});applyPropertyDetails();openDashboardFromUrl();});document.addEventListener('DOMContentLoaded',applyPropertyDetails);})();
