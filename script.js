@@ -17,6 +17,10 @@ let authMode = "login";
 function qs(id){return document.getElementById(id)}
 function toggleMenu(){qs("navLinks")?.classList.toggle("active")}
 document.addEventListener('click',e=>{if(e.target.matches('.nav-links a')) qs('navLinks')?.classList.remove('active')})
+document.addEventListener('click',e=>{
+  const link=e.target.closest('a[href$="404page.html"]');
+  if(link && typeof saveReturnPosition==='function') saveReturnPosition();
+})
 function openAuth(mode){startAuthLoad(mode)}
 function closeAuth(){qs("authModal").style.display="none"}
 function switchAuth(){authMode=authMode==="login"?"signup":"login";updateAuthUI();clearLoginError()}
@@ -60,7 +64,40 @@ function logout(){qs("dashboard").style.display="none";qs("website").style.displ
 function showToast(msg){let t=qs('toast'); if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t)} t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400)}
 function scrollToSection(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth'})}
 function searchProperties(){const loc=qs('searchLocation')?.value || 'your selected location'; const type=qs('searchType')?.value || 'property'; const budget=qs('searchBudget')?.value || 'budget'; showToast(`Searching ${type} in ${loc} within ${budget}`); if(!location.pathname.endsWith('properties.html')) location.href='properties.html'}
-function bookVisit(name){showToast(`Visit request sent for ${name}. Please login/signup to track it.`); openAuth('signup')}
+function isDashboardVisible(){
+  const dash=qs('dashboard');
+  return !!dash && (document.body.classList.contains('dashboard-mode') || getComputedStyle(dash).display!=='none');
+}
+function saveReturnPosition(){
+  const activeDash=document.querySelector('.dashboard .dash-tab.active');
+  sessionStorage.setItem('stacklyReturnPosition',JSON.stringify({
+    url:window.location.href,
+    scrollY:window.scrollY,
+    dashboardVisible:isDashboardVisible(),
+    dashboardTab:activeDash ? activeDash.id.replace('dash-','') : ''
+  }));
+}
+function restoreReturnPosition(){
+  const raw=sessionStorage.getItem('stacklyReturnPositionPending');
+  if(!raw) return;
+  sessionStorage.removeItem('stacklyReturnPositionPending');
+  sessionStorage.removeItem('stacklyReturnPosition');
+  let data;
+  try{data=JSON.parse(raw)}catch(e){return}
+  if(data.dashboardVisible){
+    document.body.classList.add('dashboard-mode');
+    if(qs('website')) qs('website').style.display='none';
+    if(qs('dashboard')) qs('dashboard').style.display='block';
+    setupDashboardMenu();
+    const dashLink=[...document.querySelectorAll('.dashboard .sidebar a:not(.logo)')].find(a=>a.getAttribute('onclick')?.includes(`'${data.dashboardTab}'`));
+    if(data.dashboardTab) showDashTab(data.dashboardTab,dashLink);
+  }
+  setTimeout(()=>window.scrollTo(0,Number(data.scrollY)||0),80);
+}
+function bookVisit(name){
+  saveReturnPosition();
+  window.location.href='404page.html';
+}
 function viewProperty(name){const key=getPropertyKey(name);showToast(`Opening details for ${name}`);location.href='property-details.html?property='+key}
 function contactAgent(name){showToast(`${name} will contact you shortly`); openAuth('signup')}
 function readArticle(title){showToast(`Opening article: ${title}`)}
@@ -101,6 +138,7 @@ function sendContact(){
   showToast('Message sent successfully. Redirecting...');
   clearAllContactErrors();
   setTimeout(()=>{
+    saveReturnPosition();
     window.location.href='404page.html';
   },600);
 }
@@ -215,4 +253,4 @@ function openDashboardFromUrl(){
   setupDashboardMenu();
   history.replaceState(null,'','index.html');
 }
-(function(){window.addEventListener('load',()=>{document.querySelectorAll('.dashboard .sidebar .logo,.dashboard .dash-mobile-brand').forEach(a=>{a.href='#';a.onclick=goDashboardHome});const page=(location.pathname.split('/').pop()||'index.html');document.querySelectorAll('.nav-links a').forEach(a=>{if(a.getAttribute('href')===page || (page==='index.html'&&a.getAttribute('href')==='index.html'))a.classList.add('active-module')});applyPropertyDetails();openDashboardFromUrl();});document.addEventListener('DOMContentLoaded',applyPropertyDetails);})();
+(function(){window.addEventListener('load',()=>{document.querySelectorAll('.dashboard .sidebar .logo,.dashboard .dash-mobile-brand').forEach(a=>{a.href='#';a.onclick=goDashboardHome});const page=(location.pathname.split('/').pop()||'index.html');document.querySelectorAll('.nav-links a').forEach(a=>{if(a.getAttribute('href')===page || (page==='index.html'&&a.getAttribute('href')==='index.html'))a.classList.add('active-module')});applyPropertyDetails();openDashboardFromUrl();restoreReturnPosition();});document.addEventListener('DOMContentLoaded',applyPropertyDetails);})();

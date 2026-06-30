@@ -94,9 +94,30 @@ body{
     <h2>Page Not Found</h2>
     <p>This social media page is not available right now. Please return to the home page or contact the Stackly Estate team.</p>
     <div class="error-actions">
-      <a class="home" href="index.html">Back To Home</a>
+      <a class="home" href="#" onclick="goBack(event)">Go Back</a>
       <a class="contact" href="contact.html">Contact Us</a>
     </div>
   </main>
+  <script>
+    function goBack(event){
+      event.preventDefault();
+      const saved=sessionStorage.getItem('stacklyReturnPosition');
+      if(saved){
+        try{
+          const data=JSON.parse(saved);
+          sessionStorage.setItem('stacklyReturnPositionPending',saved);
+          window.location.href=data.url || 'index.html';
+          return;
+        }catch(error){
+          sessionStorage.removeItem('stacklyReturnPosition');
+        }
+      }
+      if(window.history.length > 1){
+        window.history.back();
+        return;
+      }
+      window.location.href = 'index.html';
+    }
+  </script>
 </body>
 </html>
