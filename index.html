@@ -536,11 +536,13 @@ function authSubmit(){
     return;
   }
   const displayName = name || email.split('@')[0] || 'User';
-  document.getElementById('userName').textContent = displayName;
-  document.getElementById('profileName').textContent = displayName;
-  const profileAction = document.querySelector('.profile-action');
-  if(profileAction) profileAction.textContent = 'Profile ' + (displayName.charAt(0).toUpperCase() + displayName.slice(1));
-  document.getElementById('profileEmail').textContent = email;
+  if(typeof updateDashboardProfile === 'function'){
+    updateDashboardProfile(displayName, email);
+  }else{
+    document.getElementById('userName').textContent = displayName;
+    document.getElementById('profileName').textContent = displayName;
+    document.getElementById('profileEmail').textContent = email;
+  }
   closeAuth();
   document.body.classList.add('dashboard-mode');
   closeDashMenu();

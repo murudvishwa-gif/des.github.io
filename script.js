@@ -145,19 +145,84 @@ function formatProfileName(name){
   const clean=(name || 'User').trim() || 'User';
   return clean.replace(/\b\w/g,letter=>letter.toUpperCase());
 }
+function getProfileInitial(name){
+  return (formatProfileName(name).charAt(0) || 'U').toUpperCase();
+}
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+}
 function updateDashboardProfile(name,email){
   const displayName=(name || 'User').trim() || 'User';
   if(qs('userName')) qs('userName').innerText=displayName;
   if(qs('profileName')) qs('profileName').innerText=displayName;
   if(qs('profileEmail')) qs('profileEmail').innerText=email || 'user@email.com';
   document.querySelectorAll('.profile-action').forEach(btn=>{
-    btn.textContent='Profile '+formatProfileName(displayName);
+    btn.innerHTML='<span class="profile-avatar" aria-hidden="true">'+escapeHtml(getProfileInitial(displayName))+'</span><span class="profile-name">'+escapeHtml(formatProfileName(displayName))+'</span>';
+    btn.setAttribute('aria-label','Open profile for '+formatProfileName(displayName));
   });
 }
 function openProfileTab(){
   const profileLink=[...document.querySelectorAll('.dashboard .sidebar a:not(.logo)')].find(a=>a.getAttribute('onclick')?.includes("'profile'"));
   showDashTab('profile',profileLink);
   closeDashMenu();
+}
+function openNotifications(){
+  const messagesLink=[...document.querySelectorAll('.dashboard .sidebar a:not(.logo)')].find(a=>a.getAttribute('onclick')?.includes("'messages'"));
+  showDashTab('messages',messagesLink);
+  document.querySelectorAll('.notification-action .notification-badge').forEach(badge=>badge.textContent='0');
+  closeDashMenu();
+  showToast('Notifications opened');
+}
+function setupDashboardActions(){
+  document.querySelectorAll('.dashboard').forEach(dash=>{
+    const top=dash.querySelector('.dash-top');
+    const sidebar=dash.querySelector('.sidebar');
+
+    if(sidebar && !sidebar.querySelector('.sidebar-logout')){
+      const profileLink=[...sidebar.querySelectorAll('a:not(.logo)')].find(a=>a.getAttribute('onclick')?.includes("'profile'"));
+      const logoutLink=document.createElement('a');
+      logoutLink.className='sidebar-logout';
+      logoutLink.href='#';
+      logoutLink.textContent='Logout';
+      logoutLink.onclick=function(e){e.preventDefault();logout();};
+      if(profileLink) profileLink.insertAdjacentElement('afterend',logoutLink);
+      else sidebar.appendChild(logoutLink);
+    }
+
+    if(top){
+      let profileAction=top.querySelector('.profile-action');
+      if(!profileAction){
+        profileAction=document.createElement('button');
+        profileAction.className='logout profile-action';
+        profileAction.type='button';
+        profileAction.onclick=openProfileTab;
+      }
+      profileAction.classList.add('profile-action');
+      profileAction.type='button';
+      profileAction.onclick=openProfileTab;
+
+      let actions=top.querySelector('.dash-actions');
+      if(!actions){
+        actions=document.createElement('div');
+        actions.className='dash-actions';
+        top.appendChild(actions);
+      }
+
+      let notify=actions.querySelector('.notification-action');
+      if(!notify){
+        notify=document.createElement('button');
+        notify.className='notification-action';
+        notify.type='button';
+        notify.setAttribute('aria-label','Open notifications');
+        notify.onclick=openNotifications;
+        notify.innerHTML='<span class="notification-icon" aria-hidden="true">!</span><span class="notification-badge">2</span>';
+        actions.prepend(notify);
+      }
+
+      if(profileAction.parentElement!==actions) actions.appendChild(profileAction);
+    }
+  });
+  updateDashboardProfile(qs('userName')?.textContent || 'User',qs('profileEmail')?.textContent || 'user@email.com');
 }
 const reveals=document.querySelectorAll(".reveal");function revealOnScroll(){reveals.forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight-80)el.classList.add("show")})}window.addEventListener("scroll",revealOnScroll);window.addEventListener("load",revealOnScroll);
 
@@ -199,6 +264,7 @@ function setupDashboardMenu(){
     dash.appendChild(overlay);
   }
   overlay.onclick=closeDashMenu;
+  setupDashboardActions();
 }
 function toggleDashMenu(){
   const dashboard=document.getElementById('dashboard');
@@ -267,4 +333,4 @@ function openDashboardFromUrl(){
   setupDashboardMenu();
   history.replaceState(null,'','index.html');
 }
-(function(){window.addEventListener('load',()=>{document.querySelectorAll('.dashboard .sidebar .logo,.dashboard .dash-mobile-brand').forEach(a=>{a.href='#';a.onclick=goDashboardHome});updateDashboardProfile(qs('userName')?.textContent || 'User',qs('profileEmail')?.textContent || 'user@email.com');const page=(location.pathname.split('/').pop()||'index.html');document.querySelectorAll('.nav-links a').forEach(a=>{if(a.getAttribute('href')===page || (page==='index.html'&&a.getAttribute('href')==='index.html'))a.classList.add('active-module')});applyPropertyDetails();openDashboardFromUrl();restoreReturnPosition();});document.addEventListener('DOMContentLoaded',applyPropertyDetails);})();
+(function(){window.addEventListener('load',()=>{document.querySelectorAll('.dashboard .sidebar .logo,.dashboard .dash-mobile-brand').forEach(a=>{a.href='#';a.onclick=goDashboardHome});setupDashboardActions();const page=(location.pathname.split('/').pop()||'index.html');document.querySelectorAll('.nav-links a').forEach(a=>{if(a.getAttribute('href')===page || (page==='index.html'&&a.getAttribute('href')==='index.html'))a.classList.add('active-module')});applyPropertyDetails();openDashboardFromUrl();restoreReturnPosition();});document.addEventListener('DOMContentLoaded',applyPropertyDetails);})();
