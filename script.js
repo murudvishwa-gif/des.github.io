@@ -96,6 +96,10 @@ function bookVisit(name){
   saveReturnPosition();
   window.location.href='404page.html';
 }
+function redirectTo404(){
+  saveReturnPosition();
+  window.location.href='404page.html';
+}
 function viewProperty(name){const key=getPropertyKey(name);showToast(`Opening details for ${name}`);location.href='property-details.html?property='+key}
 function contactAgent(name){showToast(`${name} will contact you shortly`); openAuth('signup')}
 function readArticle(title){showToast(`Opening article: ${title}`)}
