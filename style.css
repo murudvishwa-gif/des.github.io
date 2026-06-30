@@ -257,6 +257,7 @@ body.dashboard-mode{overflow-x:hidden;}
 .dashboard .price{color:#fef08a !important;}
 .dashboard .btn-outline{border-color:rgba(255,255,255,.45) !important;color:#fff !important;}
 .dashboard .logout{background:linear-gradient(135deg,#ef4444,#f97316) !important;color:#fff !important;border:0;}
+.dashboard .profile-action{background:linear-gradient(135deg,var(--gold),#38bdf8) !important;color:#07111f !important;border:0;}
 .dash-mobile-header{display:none;}
 @media(max-width:992px){
   body.dashboard-mode #dashboard{display:block !important;}

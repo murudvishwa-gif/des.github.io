@@ -48,13 +48,11 @@ function authSubmit(){
   if(!e){setLoginError('email',"Please enter your email address");return}
   if(!p){setLoginError('password',"Please enter your password");return}
   if(!e.includes('@')){setLoginError('email','Please enter a valid email address');return}
-  const finalName=authMode==="signup"?n:e.split("@")[0];
+  const finalName=authMode==="signup"?n:(e.split("@")[0] || 'User');
   qs("website").style.display="none";
   qs("dashboard").style.display="block";
   qs("authModal").style.display="none";
-  qs("userName").innerText=finalName;
-  qs("profileName").innerText=finalName;
-  qs("profileEmail").innerText=e;
+  updateDashboardProfile(finalName,e);
   setupDashboardMenu();
   closeDashMenu();
   window.scrollTo(0,0);
@@ -143,6 +141,24 @@ function sendContact(){
   },600);
 }
 function showDashTab(tab,el){document.querySelectorAll('.dash-tab').forEach(d=>d.classList.remove('active'));qs('dash-'+tab)?.classList.add('active');document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));el?.classList.add('active')}
+function formatProfileName(name){
+  const clean=(name || 'User').trim() || 'User';
+  return clean.replace(/\b\w/g,letter=>letter.toUpperCase());
+}
+function updateDashboardProfile(name,email){
+  const displayName=(name || 'User').trim() || 'User';
+  if(qs('userName')) qs('userName').innerText=displayName;
+  if(qs('profileName')) qs('profileName').innerText=displayName;
+  if(qs('profileEmail')) qs('profileEmail').innerText=email || 'user@email.com';
+  document.querySelectorAll('.profile-action').forEach(btn=>{
+    btn.textContent='Profile '+formatProfileName(displayName);
+  });
+}
+function openProfileTab(){
+  const profileLink=[...document.querySelectorAll('.dashboard .sidebar a:not(.logo)')].find(a=>a.getAttribute('onclick')?.includes("'profile'"));
+  showDashTab('profile',profileLink);
+  closeDashMenu();
+}
 const reveals=document.querySelectorAll(".reveal");function revealOnScroll(){reveals.forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight-80)el.classList.add("show")})}window.addEventListener("scroll",revealOnScroll);window.addEventListener("load",revealOnScroll);
 
 window.addEventListener('scroll',()=>{document.querySelector('header')?.classList.toggle('scrolled',window.scrollY>40);});
@@ -247,10 +263,8 @@ function openDashboardFromUrl(){
   const email=params.get('email')||'user@email.com';
   if(qs('website')) qs('website').style.display='none';
   if(qs('dashboard')) qs('dashboard').style.display='block';
-  if(qs('userName')) qs('userName').innerText=name;
-  if(qs('profileName')) qs('profileName').innerText=name;
-  if(qs('profileEmail')) qs('profileEmail').innerText=email;
+  updateDashboardProfile(name,email);
   setupDashboardMenu();
   history.replaceState(null,'','index.html');
 }
-(function(){window.addEventListener('load',()=>{document.querySelectorAll('.dashboard .sidebar .logo,.dashboard .dash-mobile-brand').forEach(a=>{a.href='#';a.onclick=goDashboardHome});const page=(location.pathname.split('/').pop()||'index.html');document.querySelectorAll('.nav-links a').forEach(a=>{if(a.getAttribute('href')===page || (page==='index.html'&&a.getAttribute('href')==='index.html'))a.classList.add('active-module')});applyPropertyDetails();openDashboardFromUrl();restoreReturnPosition();});document.addEventListener('DOMContentLoaded',applyPropertyDetails);})();
+(function(){window.addEventListener('load',()=>{document.querySelectorAll('.dashboard .sidebar .logo,.dashboard .dash-mobile-brand').forEach(a=>{a.href='#';a.onclick=goDashboardHome});updateDashboardProfile(qs('userName')?.textContent || 'User',qs('profileEmail')?.textContent || 'user@email.com');const page=(location.pathname.split('/').pop()||'index.html');document.querySelectorAll('.nav-links a').forEach(a=>{if(a.getAttribute('href')===page || (page==='index.html'&&a.getAttribute('href')==='index.html'))a.classList.add('active-module')});applyPropertyDetails();openDashboardFromUrl();restoreReturnPosition();});document.addEventListener('DOMContentLoaded',applyPropertyDetails);})();
